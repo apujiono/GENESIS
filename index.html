@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GENESIS Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Selamat Datang di GENESIS AI Assistant</h1>
+  
+  <!-- Section Chat Box -->
+  <section id="chat-section">
+    <h2>Chat dengan GENESIS</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="chat-input" placeholder="Ketuk command, misalnya 'Tambah aset'">
+    <button onclick="sendChat()">Kirim</button>
+    <p>Pesan disimpan lokal. Untuk shared, klik 'Sync to Discussions'.</p>
+    <button onclick="syncToDiscussions()">Sync to Discussions</button>
+  </section>
+  
+  <!-- Section CRUD: Tambah/Hapus Nama, Input/Simpan Data -->
+  <section id="crud-section">
+    <h2>Manajemen Data Keluarga</h2>
+    
+    <!-- Tambah/Hapus Nama Anggota -->
+    <h3>Anggota Keluarga</h3>
+    <ul id="family-list"></ul>
+    <input type="text" id="new-name" placeholder="Nama baru">
+    <input type="text" id="new-role" placeholder="Peran">
+    <button onclick="addMember()">Tambah Nama</button>
+    <button onclick="deleteMember()">Hapus Nama (masukkan nama di atas)</button>
+    
+    <!-- Input/Simpan Aset -->
+    <h3>Aset</h3>
+    <ul id="assets-list"></ul>
+    <input type="text" id="new-asset" placeholder="Aset baru, misalnya 'Mobil: Rp 200 juta'">
+    <button onclick="addAsset()">Tambah Aset</button>
+    <button onclick="deleteAsset()">Hapus Aset (masukkan aset di atas)</button>
+    
+    <!-- Hasil dan Simpan Data -->
+    <button onclick="saveData()">Simpan Data ke Local</button>
+    <button onclick="loadData()">Muat Hasil Data</button>
+    <button onclick="syncToRepo()">Sync ke Repo GitHub</button>
+  </section>
+  
+  <!-- Opsi Program Lain -->
+  <section id="program-options">
+    <h2>Opsi Program</h2>
+    <a href="https://github.com/username/GENESIS/edit/main/.github/workflows/ai-brain.yml">Edit AI Brain Workflow</a><br>
+    <a href="https://github.com/username/GENESIS/issues/new">Buat Issue Baru (Command Manual)</a><br>
+    <a href="https://github.com/username/GENESIS/discussions/new">Mulai Discussion Baru</a><br>
+    <button onclick="addPlugin()">Tambah Plugin Baru (Lokal Preview)</button>
+  </section>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
