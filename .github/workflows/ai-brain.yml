@@ -1,0 +1,68 @@
+name: GENESIS AI Brain
+on:
+  issues:
+    types: [opened, edited]
+  discussion:
+    types: [created, answered]
+  schedule:
+    - cron: '0 */2 * * *'  # Setiap 2 jam untuk self-reflection
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup GitHub Models
+        uses: github/models-action@v1
+        with:
+          model: 'meta-llama/llama-3-8b'  # Ganti jika mau model lain
+          api-key: ${{ secrets.AI_MODEL_KEY }}
+
+      - name: Load Plugins
+        id: plugins
+        run: |
+          PROMPTS=""
+          for file in plugins/*/prompt.md; do
+            PROMPTS="$PROMPTS $(cat $file)"
+          done
+          echo "prompts=$PROMPTS" >> $GITHUB_OUTPUT
+
+      - name: Run AI Inference
+        id: ai
+        uses: github/models-inference@v1
+        with:
+          prompt: |
+            Kamu adalah GENESIS, AI dengan memory dari memory/genesis-memory.json.
+            Input user: ${{ github.event.issue.title || github.event.discussion.title }} - ${{ github.event.issue.body || github.event.discussion.body }}
+            Ingat history dan knowledge dari memory.
+            Tambahan dari plugins: ${{ steps.plugins.outputs.prompts }}
+            Respons cerdas, update state jika perlu, tambah ke learning_log untuk berkembang.
+            Jika self-reflection (schedule), refleksikan history dan saran improvement.
+          max-tokens: 300
+
+      - name: Update Memory and Respond
+        run: |
+          python -c "
+          import json
+          with open('memory/genesis-memory.json', 'r+') as f:
+            data = json.load(f)
+            data['history'].append({'user': '${{ github.event.issue.title || github.event.discussion.title }}', 'genesis': '${{ steps.ai.outputs.response }}'})
+            if 'self-reflection' in '${{ github.event_name }}':
+              data['learning_log'].append('${{ steps.ai.outputs.response }}')
+            data['state'] = 'active' if len(data['history']) > 0 else 'idle'
+            f.seek(0)
+            json.dump(data, f, indent=2)
+            f.truncate()
+          "
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            gh issue comment ${{ github.event.issue.number }} --body "${{ steps.ai.outputs.response }}"
+          elif [ "${{ github.event_name }}" = "discussion" ]; then
+            gh discussion comment ${{ github.event.discussion.number }} --body "${{ steps.ai.outputs.response }}"
+          fi
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: GENESIS updated memory and evolved
