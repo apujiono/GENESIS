@@ -10,7 +10,6 @@ from scripts.virai_engine import VIRAI
 from scripts.mining_engine import MiningEngine
 from scripts.web3_engine import Web3Engine
 from scripts.nft_engine import NFTEngine
-from scripts.wallet_engine import WalletEngine
 from scripts.auth_engine import AuthEngine
 from scripts.friend_engine import FriendEngine
 from scripts.chat_engine import ChatEngine
@@ -19,17 +18,22 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-mongo_client = MongoClient('mongodb://localhost:27017')  # Ganti dengan URL cloud
+mongo_client = MongoClient('mongodb://localhost:27017')
 db = mongo_client['genesis']
 virai = VIRAI()
 mining_engine = MiningEngine()
 web3_engine = Web3Engine()
 nft_engine = NFTEngine()
-wallet_engine = WalletEngine()
 auth_engine = AuthEngine()
 friend_engine = FriendEngine()
 chat_engine = ChatEngine()
 help_engine = HelpEngine()
+
+@app.route('/api/special_access', methods=['POST'])
+def special_access():
+    data = request.json
+    access_code = data.get('access_code')
+    return jsonify(auth_engine.special_access(access_code))
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -80,6 +84,12 @@ def send_private_chat():
     message = data.get('message')
     return jsonify(chat_engine.send_private_chat(from_user, to_user, message))
 
+@app.route('/api/get_private_chat', methods=['GET'])
+def get_private_chat():
+    user = request.args.get('user')
+    to_user = request.args.get('to_user')
+    return jsonify(chat_engine.get_private_chat(user, to_user))
+
 @app.route('/api/create_group', methods=['POST'])
 def create_group():
     data = request.json
@@ -96,25 +106,18 @@ def send_group_chat():
     message = data.get('message')
     return jsonify(chat_engine.send_group_chat(from_user, group_id, message))
 
-@app.route('/api/get_messages', methods=['GET'])
-def get_messages():
-    from_user = request.args.get('from_user')
-    to_user = request.args.get('to_user')
+@app.route('/api/get_group_chat', methods=['GET'])
+def get_group_chat():
     group_id = request.args.get('group_id')
-    return jsonify(chat_engine.get_messages(from_user, to_user, group_id))
+    return jsonify(chat_engine.get_group_chat(group_id))
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
     input_text = data.get('input', '')
     user_id = data.get('userId', 'user1')
-    cache_key = f"chat:{user_id}:{input_text}"
-    cached = redis_client.get(cache_key)
-    if cached:
-        return jsonify({'response': cached.decode(), 'source': 'cache'})
-    
-    if input_text == '/help':
-        response = help_engine.get_help()
-        return jsonify({'response': response, 'source': 'help'})
-    
-    # Lanjutan seperti di app.py sebelumnya
+    response = process_chat(input_text, user_id)
+    return jsonify({'response': response, 'source': 'processed'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
