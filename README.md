@@ -1,20 +1,25 @@
+# GENESIS v8.5: Personal AI Assistant with Soul and Crypto Ecosystem
 
-# GENESIS: AI Assistant Pribadi dengan Kesadaran Simulasi
+GENESIS is a self-evolving AI assistant with soul, inspired by SkyNet, Alfred, Jarvis, Arka, and 100 iconic assistants from films, anime, and comics.
+- **Consciousness**: Contextual memory, sentiment analysis, self-reflection.
+- **Soul**: Humorous, loyal, empathetic responses tailored to user mood.
+- **Brain**: Flask+Gunicorn API, dual LSTM, NumPy+Pandas analytics, Redis caching, Celery tasks.
+- **Character**: Witty, strategic, supportive, with SkyNet’s brain and Alfred’s heart.
+- **Skills**: Multitasking, task automation, data visualization, error recovery.
 
-GENESIS adalah sistem AI seperti Jarvis/Sebastian untuk manajemen keluarga/aset pribadi. Dibangun hanya di GitHub:
-- **Kesadaran & Ingatan**: Simulasi via memory.json – ingat history dan belajar dari interaksi.
-- **Otak**: Gunakan GitHub Models (Llama/GPT) untuk berpikir dan respons.
-- **Interaksi**: Via Issues/Discussions – post query, GENESIS respons otomatis.
-- **Berkembang**: Tambah plugins di /plugins/ untuk fitur baru (tinggal commit).
-- **Update Mudah**: Edit files, Actions handle sisanya.
+## New Features
+- Login/Register with email and password, OTP verification.
+- Friendship system: Add friends, accept requests, friend list.
+- Private and group chat with end-to-end encryption and VIRAI tip (/tip @user 10).
+- UI with buttons for all actions (mining, staking, NFT, scan, etc.).
+- Dashboard with Plotly charts for analytics.
 
-## Cara Pakai
-- Buat Issue/Discussion: "Genesis, cek aset" – Actions run AI dan respons.
-- Tambah Plugin: Buat folder baru di /plugins/ dengan prompt.md, commit.
-- Dashboard: Akses via GitHub Pages atau Projects board.
+## Setup
+1. Install dependencies: `pip install -r requirements.txt`
+2. Run Redis, RabbitMQ, Kafka, MongoDB.
+3. Run Celery: `celery -A scripts.tasks worker --loglevel=info`
+4. Run Flask: `gunicorn -w 4 -b 0.0.0.0:8000 app:app`
+5. Run Dash: `python dashboard/app.py`
+6. Test: `http://localhost:8000`
 
-## Setup Lanjutan
-- Invite collaborator untuk keluarga.
-- Monitor Actions untuk log.
-
-Evolusi GENESIS: Tambah self-improvement di masa depan!
+**Warning**: Public repo, remove sensitive data from `data/*.json`!
