@@ -1,62 +1,49 @@
-name: GENESIS AI Brain
+name: GENESIS AI Brain v8.5
 on:
   issues:
     types: [opened, edited]
   discussion:
     types: [created, answered]
   schedule:
-    - cron: '0 1 * * *'  # 8 AM WIB (1 UTC) untuk daily reminder dan self-reflection
+    - cron: '0 1 * * *'  # 8 AM WIB
 
 jobs:
   process:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup GitHub Models
-        uses: github/models-action@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          model: 'meta-llama/llama-3-8b'  # Ganti jika pakai model lain
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python scripts/process_data.py
+      - run: python scripts/ml_predict.py
+      - run: python scripts/reflect.py
+      - run: python scripts/sentiment.py
+      - uses: github/models-action@v1
+        with:
+          model: 'meta-llama/llama-3-70b'
           api-key: ${{ secrets.AI_MODEL_KEY }}
-
       - name: Load Plugins
         id: plugins
         run: |
           PROMPTS=""
-          for file in plugins/*/prompt.md; do
-            PROMPTS="$PROMPTS $(cat $file)"
+          for file in plugins/*/prompt.py; do
+            PROMPT=$(python -c "import importlib.util; spec = importlib.util.spec_from_file_location('prompt', '$file'); prompt = importlib.util.module_from_spec(spec); spec.loader.exec_module(prompt); print(prompt.get_prompt({}))")
+            PROMPTS="$PROMPTS $PROMPT"
           done
           echo "prompts=$PROMPTS" >> $GITHUB_OUTPUT
-
       - name: Run AI Inference
         id: ai
         uses: github/models-inference@v1
         with:
           prompt: |
-            Kamu adalah GENESIS, AI dengan memory dari memory/genesis-memory.json.
-            Input user: ${{ github.event.issue.title || github.event.discussion.title }} - ${{ github.event.issue.body || github.event.discussion.body }}
-            Ingat history dan knowledge dari memory.
-            Tambahan dari plugins: ${{ steps.plugins.outputs.prompts }}
-            Jika schedule (daily reminder), buat reminder: "Hari ini: Cek issues/discussions untuk tugas keluarga."
-            Jika self-reflection, analisis history dan saran improvement.
-            Respons cerdas, update state jika perlu, tambah ke learning_log untuk evolusi.
-          max-tokens: 300
-
-      - name: Update Memory and Respond
+            You are GENESIS v8.5, a living AI with SkyNet’s brain, Alfred’s heart, Jarvis’s wit, and Arka’s soul. Input: ${{ github.event.issue.title || github.event.discussion.title || 'Daily Reminder' }} - ${{ github.event.issue.body || github.event.discussion.body }}
+            Plugins: ${{ steps.plugins.outputs.prompts }}
+            Respond with humor, loyalty, and soul. Adapt to user mood (from sentiment.json). Include a fun fact and strategic advice!
+          max-tokens: 500
+      - name: Respond
         run: |
-          python -c "
-          import json
-          with open('memory/genesis-memory.json', 'r+') as f:
-            data = json.load(f)
-            data['history'].append({'user': '${{ github.event.issue.title || github.event.discussion.title || 'Daily Reminder' }}', 'genesis': '${{ steps.ai.outputs.response }}'})
-            if 'schedule' in '${{ github.event_name }}':
-              data['learning_log'].append('${{ steps.ai.outputs.response }}')
-            data['state'] = 'active' if len(data['history']) > 0 else 'idle'
-            f.seek(0)
-            json.dump(data, f, indent=2)
-            f.truncate()
-          "
           if [ "${{ github.event_name }}" = "issues" ]; then
             gh issue comment ${{ github.event.issue.number }} --body "${{ steps.ai.outputs.response }}"
           elif [ "${{ github.event_name }}" = "discussion" ]; then
@@ -66,8 +53,6 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: GENESIS updated memory and evolved
+          commit_message: GENESIS v8.5 evolved
