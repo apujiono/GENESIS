@@ -6,13 +6,11 @@
       "phases": {
         "setup": {
           "nixPkgs": ["python3.10", "gcc"],
-          "aptPkgs": ["build-essential", "python3-pip"]
+          "aptPkgs": ["build-essential"]
         },
         "install": {
           "cmds": [
-            "python3.10 -m venv /app/.venv",
-            "/app/.venv/bin/pip install --upgrade pip",
-            "/app/.venv/bin/pip install --no-cache-dir --timeout 900 -r requirements.txt"
+            "python3.10 -m venv /app/.venv && . /app/.venv/bin/activate && /app/.venv/bin/pip install --upgrade pip && /app/.venv/bin/pip install --no-cache-dir --timeout 900 -r requirements.txt"
           ]
         }
       },
