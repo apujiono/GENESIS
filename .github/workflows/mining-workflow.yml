@@ -1,0 +1,16 @@
+name: GENESIS Mining
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 10 AM WIB
+
+jobs:
+  mining:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: pip install -r requirements.txt
+      - run: python scripts/mining_engine.py
+      - run: echo "Mining simulation completed"
