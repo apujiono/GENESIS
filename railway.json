@@ -1,7 +1,28 @@
-"install": {
-  "cmds": [
-    "python -m venv /app/.venv",
-    ". /app/.venv/bin/activate",
-    "pip install --no-cache-dir --timeout 900 -r requirements.txt"
-  ]
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["python3.10", "gcc"],
+          "aptPkgs": ["build-essential"]
+        },
+        "install": {
+          "cmds": [
+            "python -m venv /app/.venv",
+            ". /app/.venv/bin/activate",
+            "pip install --no-cache-dir --timeout 900 -r requirements.txt"
+          ]
+        }
+      },
+      "cache": {
+        "enabled": true,
+        "paths": ["/root/.cache/pip", "/app/.venv"]
+      }
+    }
+  },
+  "deploy": {
+    "startCommand": "gunicorn -w 2 -b 0.0.0.0:8000 app:app"
+  }
 }
