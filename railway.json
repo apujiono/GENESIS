@@ -6,13 +6,12 @@
       "phases": {
         "setup": {
           "nixPkgs": ["python3.10", "gcc"],
-          "aptPkgs": ["build-essential"]
+          "aptPkgs": ["build-essential", "python3-pip"]
         },
         "install": {
           "cmds": [
-            "python -m venv /app/.venv",
-            ". /app/.venv/bin/activate",
-            "pip install --no-cache-dir --timeout 900 -r requirements.txt"
+            "python3.10 -m venv /app/.venv",
+            "/app/.venv/bin/pip install --no-cache-dir --timeout 900 -r requirements.txt"
           ]
         }
       },
@@ -23,6 +22,6 @@
     }
   },
   "deploy": {
-    "startCommand": "gunicorn -w 2 -b 0.0.0.0:8000 app:app"
+    "startCommand": "/app/.venv/bin/gunicorn -w 2 -b 0.0.0.0:8000 app:app"
   }
 }
