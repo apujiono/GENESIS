@@ -17,6 +17,30 @@ if (token) {
   document.getElementById('analytics-section').style.display = 'block';
 }
 
+async function specialAccess() {
+  const access_code = document.getElementById('access-code').value;
+  const response = await fetch('http://localhost:8000/api/special_access', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ access_code })
+  }).then(res => res.json());
+  if (response.status === 'logged_in') {
+    localStorage.setItem('jwt_token', response.token);
+    token = response.token;
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('chat-section').style.display = 'block';
+    document.getElementById('friends-section').style.display = 'block';
+    document.getElementById('private-chat-section').style.display = 'block';
+    document.getElementById('group-chat-section').style.display = 'block';
+    document.getElementById('quick-actions').style.display = 'block';
+    document.getElementById('wallet-section').style.display = 'block';
+    document.getElementById('analytics-section').style.display = 'block';
+    document.getElementById('predictions').innerText = `Special Access: ${response.message} as ${response.email}`;
+  } else {
+    document.getElementById('predictions').innerText = `Special Access Failed: ${response.message}`;
+  }
+}
+
 async function register() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -133,26 +157,26 @@ async function sendGroupMessage() {
   document.getElementById('predictions').innerText = `Group Message: ${response.status} in ${group_id}`;
 }
 
-async function showHelp() {
-  const response = await fetch('http://localhost:8000/api/help').then(res => res.json());
-  const chatBox = document.getElementById('chat-box');
-  chatBox.innerHTML += `<p>GENESIS: ${response.response}</p>`;
-  chatBox.scrollTop = chatBox.scrollHeight;
+async function getMessages(type) {
+  let url = type === 'private' ? 
+    `http://localhost:8000/api/get_private_chat?user=${localStorage.getItem('user_email')}&to_user=${document.getElementById('to-user').value}` :
+    `http://localhost:8000/api/get_group_chat?group_id=${document.getElementById('group-id').value}`;
+  const response = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  }).then(res => res.json());
+  const chatBox = type === 'private' ? document.getElementById('private-chat') : document.getElementById('group-chat');
+  chatBox.innerHTML = response.chats.map(c => `<p>${c.from}: ${c.message}</p>`).join('');
 }
 
-async function updateStats() {
-  const response = await fetch('http://localhost:8000/api/analytics').then(res => res.json());
-  document.getElementById('attack-stats').innerText = `Attacks Detected: ${response.attacks || 0}`;
-  document.getElementById('mining-stats').innerText = `Mining Reward: ${response.mining_reward || 0} VIRAI`;
-  document.getElementById('nft-stats').innerText = `NFTs Generated: ${response.nfts_generated || 0}`;
-}
-
-async function startMining(coin) {
-  const response = await fetch('http://localhost:8000/api/mining/start', {
+async function sendChat() {
+  const input = document.getElementById('chat-input').value;
+  const userId = localStorage.getItem('genesis_userId') || 'user1';
+  const response = await fetch('http://localhost:8000/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ coin })
+    body: JSON.stringify({ input, userId })
   }).then(res => res.json());
-  document.getElementById('predictions').innerText = `Mining: ${response.status}, Hash Rate: ${response.hash_rate || 0}, Reward: ${response.reward || 0}`;
-  updateStats();
+  const chatBox = document.getElementById('chat-box');
+  chatBox.innerHTML += `<p>User: ${input}</p><p>GENESIS: ${response.response}</p>`;
+  document.getElementById('fun-fact').innerText = funFacts[Math.floor(Math.random() * funFacts.length)];
 }
