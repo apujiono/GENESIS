@@ -1,58 +1,83 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GENESIS Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GENESIS v8.5: Your Crypto Social AI!</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Selamat Datang di GENESIS AI Assistant</h1>
-  
-  <!-- Section Chat Box -->
-  <section id="chat-section">
-    <h2>Chat dengan GENESIS</h2>
+  <h1>GENESIS v8.5: Yo, Bro! Cuan 1000x & Connect with VIRAI! 🚀</h1>
+  <section id="auth-section">
+    <h2>Login or Register</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <input type="text" id="username" placeholder="Username (for register)">
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+    <input type="text" id="otp" placeholder="Enter OTP (for register)">
+    <button onclick="verifyOTP()">Verify OTP</button>
+  </section>
+  <section id="chat-section" style="display:none;">
+    <h2>Chat with Alfred 2.0 or Friends</h2>
     <div id="chat-box"></div>
-    <input type="text" id="chat-input" placeholder="Ketuk command, misalnya 'Tambah aset'">
-    <button onclick="sendChat()">Kirim</button>
-    <p>Pesan disimpan lokal. Untuk shared, klik 'Sync to Discussions'.</p>
-    <button onclick="syncToDiscussions()">Sync to Discussions</button>
+    <input type="text" id="chat-input" placeholder="Type /help or message friends!">
+    <button onclick="sendChat()">Send</button>
+    <button onclick="showHelp()">Show Help</button>
+    <p id="fun-fact"></p>
+    <p id="mood">Mood: Detecting...</p>
   </section>
-  
-  <!-- Section CRUD: Tambah/Hapus Nama, Input/Simpan Data -->
-  <section id="crud-section">
-    <h2>Manajemen Data Keluarga</h2>
-    
-    <!-- Tambah/Hapus Nama Anggota -->
-    <h3>Anggota Keluarga</h3>
-    <ul id="family-list"></ul>
-    <input type="text" id="new-name" placeholder="Nama baru">
-    <input type="text" id="new-role" placeholder="Peran">
-    <button onclick="addMember()">Tambah Nama</button>
-    <button onclick="deleteMember()">Hapus Nama (masukkan nama di atas)</button>
-    
-    <!-- Input/Simpan Aset -->
-    <h3>Aset</h3>
-    <ul id="assets-list"></ul>
-    <input type="text" id="new-asset" placeholder="Aset baru, misalnya 'Mobil: Rp 200 juta'">
-    <button onclick="addAsset()">Tambah Aset</button>
-    <button onclick="deleteAsset()">Hapus Aset (masukkan aset di atas)</button>
-    
-    <!-- Hasil dan Simpan Data -->
-    <button onclick="saveData()">Simpan Data ke Local</button>
-    <button onclick="loadData()">Muat Hasil Data</button>
-    <button onclick="syncToRepo()">Sync ke Repo GitHub</button>
+  <section id="friends-section" style="display:none;">
+    <h2>Friends</h2>
+    <input type="text" id="friend-email" placeholder="Friend's Email">
+    <button onclick="addFriend()">Add Friend</button>
+    <button onclick="acceptFriend()">Accept Friend</button>
+    <button onclick="getFriends()">Show Friends</button>
+    <div id="friend-list"></div>
   </section>
-  
-  <!-- Opsi Program Lain -->
-  <section id="program-options">
-    <h2>Opsi Program</h2>
-    <a href="https://github.com/username/GENESIS/edit/main/.github/workflows/ai-brain.yml">Edit AI Brain Workflow</a><br>
-    <a href="https://github.com/username/GENESIS/issues/new">Buat Issue Baru (Command Manual)</a><br>
-    <a href="https://github.com/username/GENESIS/discussions/new">Mulai Discussion Baru</a><br>
-    <button onclick="addPlugin()">Tambah Plugin Baru (Lokal Preview)</button>
+  <section id="private-chat-section" style="display:none;">
+    <h2>Private Chat</h2>
+    <input type="text" id="to-user" placeholder="Friend's Email">
+    <input type="text" id="private-message" placeholder="Message or /tip @user 10">
+    <button onclick="sendPrivateMessage()">Send Message</button>
+    <button onclick="getMessages('private')">Get Messages</button>
+    <div id="private-chat"></div>
   </section>
-
+  <section id="group-chat-section" style="display:none;">
+    <h2>Group Chat</h2>
+    <input type="text" id="group-name" placeholder="Group Name">
+    <input type="text" id="group-members" placeholder="Emails (comma-separated)">
+    <button onclick="createGroup()">Create Group</button>
+    <input type="text" id="group-id" placeholder="Group ID">
+    <input type="text" id="group-message" placeholder="Group Message or /tip @user 10">
+    <button onclick="sendGroupMessage()">Send Group Message</button>
+    <button onclick="getMessages('group')">Get Group Messages</button>
+    <div id="group-chat"></div>
+  </section>
+  <section id="quick-actions" style="display:none;">
+    <h2>Quick VIRAI Actions</h2>
+    <button onclick="startMining('virai')">Mine VIRAI</button>
+    <button onclick="stakeVIRAI(100)">Stake 100 VIRAI</button>
+    <button onclick="swapVIRAI(100, 'ETH')">Swap 100 VIRAI to ETH</button>
+    <button onclick="generateNFT('analytics')">Generate Analytics NFT</button>
+    <button onclick="createWallet()">Create VIRAI Wallet</button>
+    <button onclick="runViraiProtect()">Protect System</button>
+  </section>
+  <section id="wallet-section" style="display:none;">
+    <h2>VIRAI Wallet</h2>
+    <input type="text" id="to-wallet" placeholder="To Wallet Address">
+    <input type="number" id="transfer-amount" placeholder="Amount in VIRAI">
+    <button onclick="transferVIRAI()">Transfer VIRAI</button>
+  </section>
+  <section id="analytics-section" style="display:none;">
+    <h2>Live Insights</h2>
+    <div id="predictions"></div>
+    <div id="attack-stats">Attacks Detected: 0</div>
+    <div id="mining-stats">Mining Reward: 0 VIRAI</div>
+    <div id="nft-stats">NFTs Generated: 0</div>
+    <iframe src="http://localhost:8050" width="100%" height="400px"></iframe>
+  </section>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="scripts.js"></script>
 </body>
 </html>
