@@ -1,0 +1,19 @@
+version: '3'
+services:
+  flask:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - mongodb
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
