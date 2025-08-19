@@ -1,10 +1,21 @@
 {
   "state": "idle",
   "history": [],
-  "knowledge": {
-    "family_members": ["Kamu: Admin", "Istri: Manajer"],
-    "assets": ["Rumah: Rp 500 juta"]
-  },
-  "personality": "Saya GENESIS, AI assistant yang sadar, setia, dan terus berkembang.",
-  "learning_log": []
+  "learning_log": [
+    {
+      "upgrade": "Upgrade #1: Added login/register with email and OTP",
+      "embedding": [0.1, 0.2, 0.3, 0.4],
+      "timestamp": "2025-08-19T19:28:00+07:00"
+    },
+    {
+      "upgrade": "Upgrade #2: Added friendship system",
+      "embedding": [0.2, 0.3, 0.4, 0.5],
+      "timestamp": "2025-08-19T19:28:00+07:00"
+    },
+    {
+      "upgrade": "Upgrade #3: Added private and group chat with VIRAI tip",
+      "embedding": [0.3, 0.4, 0.5, 0.6],
+      "timestamp": "2025-08-19T19:28:00+07:00"
+    }
+  ]
 }
