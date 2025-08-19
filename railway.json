@@ -11,6 +11,7 @@
         "install": {
           "cmds": [
             "python3.10 -m venv /app/.venv",
+            "/app/.venv/bin/pip install --upgrade pip",
             "/app/.venv/bin/pip install --no-cache-dir --timeout 900 -r requirements.txt"
           ]
         }
