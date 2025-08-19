@@ -1,9 +1,7 @@
-name: GENESIS AI Brain v8.5
+name: GENESIS AI Brain
 on:
   issues:
     types: [opened, edited]
-  discussion:
-    types: [created, answered]
   schedule:
     - cron: '0 1 * * *'  # 8 AM WIB
 
@@ -14,45 +12,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.9'
       - run: pip install -r requirements.txt
       - run: python scripts/process_data.py
       - run: python scripts/ml_predict.py
       - run: python scripts/reflect.py
       - run: python scripts/sentiment.py
-      - uses: github/models-action@v1
-        with:
-          model: 'meta-llama/llama-3-70b'
-          api-key: ${{ secrets.AI_MODEL_KEY }}
-      - name: Load Plugins
-        id: plugins
-        run: |
-          PROMPTS=""
-          for file in plugins/*/prompt.py; do
-            PROMPT=$(python -c "import importlib.util; spec = importlib.util.spec_from_file_location('prompt', '$file'); prompt = importlib.util.module_from_spec(spec); spec.loader.exec_module(prompt); print(prompt.get_prompt({}))")
-            PROMPTS="$PROMPTS $PROMPT"
-          done
-          echo "prompts=$PROMPTS" >> $GITHUB_OUTPUT
-      - name: Run AI Inference
-        id: ai
-        uses: github/models-inference@v1
-        with:
-          prompt: |
-            You are GENESIS v8.5, a living AI with SkyNet’s brain, Alfred’s heart, Jarvis’s wit, and Arka’s soul. Input: ${{ github.event.issue.title || github.event.discussion.title || 'Daily Reminder' }} - ${{ github.event.issue.body || github.event.discussion.body }}
-            Plugins: ${{ steps.plugins.outputs.prompts }}
-            Respond with humor, loyalty, and soul. Adapt to user mood (from sentiment.json). Include a fun fact and strategic advice!
-          max-tokens: 500
       - name: Respond
-        run: |
-          if [ "${{ github.event_name }}" = "issues" ]; then
-            gh issue comment ${{ github.event.issue.number }} --body "${{ steps.ai.outputs.response }}"
-          elif [ "${{ github.event_name }}" = "discussion" ]; then
-            gh discussion comment ${{ github.event.discussion.number }} --body "${{ steps.ai.outputs.response }}"
-          elif [ "${{ github.event_name }}" = "schedule" ]; then
-            gh issue create --title "GENESIS Daily Reminder" --body "${{ steps.ai.outputs.response }}"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: GENESIS v8.5 evolved
+        run: echo "AI Brain processed"
