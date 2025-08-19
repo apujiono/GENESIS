@@ -7,19 +7,20 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 import random
 import string
-from scripts.wallet_engine import WalletEngine
+from scripts.virai_engine import VIRAI
 
 class AuthEngine:
     def __init__(self):
-        self.mongo_client = MongoClient('mongodb://mongodb:27017/')
+        self.mongo_client = MongoClient('mongodb://localhost:27017/')
         self.db = self.mongo_client['genesis']
-        self.wallet_engine = WalletEngine()
+        self.virai = VIRAI()
         self.jwt_secret = 'YOUR_JWT_SECRET'  # Ganti dengan secret aman
         self.smtp_server = 'smtp.gmail.com'
         self.smtp_port = 587
         self.smtp_user = 'your-email@gmail.com'  # Ganti dengan emailmu
         self.smtp_pass = 'your-app-password'  # Ganti dengan app password Gmail
         self.otp_expiry = timedelta(minutes=10)
+        self.special_access_code = 'ALFRED2BRO'  # Kode rahasia untuk akses spesial
 
     def register(self, email, password, username):
         if self.db.users.find_one({'email': email}):
@@ -38,7 +39,7 @@ class AuthEngine:
         }
         self.db.users.insert_one(user)
         self.send_otp(email, otp)
-        wallet = self.wallet_engine.create_wallet(email)
+        wallet = self.virai.create_wallet(email)
         return {'status': 'registered', 'message': 'OTP sent to email', 'wallet_public_key': wallet['public_key']}
 
     def send_otp(self, email, otp):
@@ -67,3 +68,24 @@ class AuthEngine:
             token = jwt.encode({'email': email, 'exp': datetime.utcnow() + timedelta(hours=24)}, self.jwt_secret, algorithm='HS256')
             return {'status': 'logged_in', 'token': token}
         return {'status': 'error', 'message': 'Invalid password'}
+
+    def special_access(self, access_code):
+        if access_code != self.special_access_code:
+            return {'status': 'error', 'message': 'Invalid access code'}
+        
+        email = 'admin@genesis.com'
+        if not self.db.users.find_one({'email': email}):
+            hashed_password = bcrypt.hashpw('admin123'.encode(), bcrypt.gensalt()).decode()
+            user = {
+                'email': email,
+                'username': 'admin',
+                'password': hashed_password,
+                'verified': True,
+                'timestamp': str(datetime.now())
+            }
+            self.db.users.insert_one(user)
+            wallet = self.virai.create_wallet(email)
+            self.virai.wallets[email]['balance'] = 100  # Bonus 100 VIRAI untuk admin
+        
+        token = jwt.encode({'email': email, 'exp': datetime.utcnow() + timedelta(hours=24)}, self.jwt_secret, algorithm='HS256')
+        return {'status': 'logged_in', 'token': token, 'email': email, 'message': 'Special access granted!'}
