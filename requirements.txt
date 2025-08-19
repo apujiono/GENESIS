@@ -15,7 +15,7 @@ jsonschema==4.22.0
 scapy==2.5.0
 pyshark==0.6.0
 python-nmap==0.7.1
-pymonero==0.8.0
+pymonero==0.7.0
 psutil==6.0.0
 qiskit==1.2.0
 pennylane==0.37.0
