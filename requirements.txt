@@ -7,3 +7,7 @@ pynacl==1.5.0
 pandas==2.2.2
 plotly==5.22.0
 dash==2.17.1
+taichi==1.7.0
+mujoco==2.3.7
+numpy==1.24.3
+fluidlab
